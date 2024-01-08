@@ -4,6 +4,10 @@ require_once "conexion.php";
 try {
     $stmt = $pdo->query("SELECT * FROM inmueble");
     $resultados = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $consulta = $pdo->prepare("SELECT inmueble, COUNT(*) as totalRegistros FROM comprobante GROUP BY inmueble");
+    $consulta->execute();
+    $result = $consulta->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     echo "Error al obtener los datos: " . $e->getMessage();
 }
@@ -21,12 +25,13 @@ try {
 </head>
 
 <body style="display: flex; justify-content: center; align-items:center; padding:30px;">
-    <form action="comprobante.php" method="post" class="form-control" style="width:80%; padding:30px;">
 
+    <form action="comprobante.php" method="post" class="form-control" style="width:80%; padding:30px;">
+        <h1>Generar Comprobante <span id="num" style="font-size: 35px;"></span></h1>
         <div class="col-12">
             <label for="inmueble" class="form-label col-12">
                 Inmueble:
-                <select name="inmueble" id="inmueble" class="form-control form-select">
+                <select name="inmueble" id="inmueble" class="form-control form-select" required>
                     <?php
                     if ($resultados != null) {
                         echo '<option value="">Elija inmueble</option>';
@@ -42,7 +47,7 @@ try {
             </label>
         </div>
 
-        <input type="number" value="" id="numero" name="numero" required>
+        <input type="number" value="" id="numero" name="numero" required style="display: none;">
 
         <div id="detallesInmueble" class="col-12 row">
             <label for="direccion" class="form-label col-7">Dirección:
@@ -133,16 +138,20 @@ try {
                 </label>
             </div>
         </div>
-
         <div class="col-12 text-end">
-            <input class="btn btn-light m-2" type="submit" value="Generar" style="border: 1px solid grey;">
+            <input class="btn btn-light m-2 " type="submit" value="Generar" style="border: 1px solid grey;">
         </div>
 
     </form>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <script>
-        function generarComprobante(id, longitud = 9) {
-            id = id.toString() + "1";
+        function generarComprobante(id, contador, longitud = 9) {
+            id = id.toString();
+            if (contador != null) {
+                id += (contador.totalRegistros + 1);
+            } else {
+                id += "1";
+            }
             return id.toString().padStart(longitud, '0');
         }
 
@@ -150,17 +159,33 @@ try {
             var seleccion = this.value;
             var detallesInmueble = document.getElementById('detallesInmueble');
 
-            // Buscar el inmueble seleccionado en el array de resultados
-            var inmuebleSeleccionado = <?php echo json_encode($resultados); ?>;
-            var detalles = inmuebleSeleccionado.find(function(inmueble) {
-                return inmueble.nombre === seleccion;
-            });
+            if (seleccion === "") {
+                document.getElementById('direccion').value = "";
+                document.getElementById('inquilino').value = "";
+                document.getElementById('monto').value = "";
+                document.getElementById('numero').value = "";
+                document.getElementById('num').innerText = "";
+            } else {
+                // Buscar el inmueble seleccionado en el array de resultados
+                var inmuebleSeleccionado = <?php echo json_encode($resultados); ?>;
+                var detalles = inmuebleSeleccionado.find(function(inmueble) {
+                    return inmueble.nombre === seleccion;
+                });
+                var inmuebleSeleccionado = <?php echo json_encode($result); ?>;
+                console.log(inmuebleSeleccionado);
+                var count = inmuebleSeleccionado.find(function(inmueble) {
+                    if (inmueble.inmueble === seleccion) {
+                        return inmueble;
+                    }
+                });
 
-            // Mostrar los detalles del inmueble seleccionado
-            document.getElementById('direccion').value = detalles.direccion;
-            document.getElementById('inquilino').value = detalles.titular;
-            document.getElementById('monto').value = detalles.monto;
-            document.getElementById('numero').value = generarComprobante(detalles.id);
+                // Mostrar los detalles del inmueble seleccionado
+                document.getElementById('direccion').value = detalles.direccion;
+                document.getElementById('inquilino').value = detalles.titular;
+                document.getElementById('monto').value = detalles.monto;
+                document.getElementById('numero').value = generarComprobante(detalles.id, count);
+                document.getElementById('num').innerText = generarComprobante(detalles.id, count);
+            }
         });
     </script>
     <script>

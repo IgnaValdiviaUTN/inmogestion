@@ -8,3 +8,9 @@ span {
     color: rgb(48, 103, 133);
 
 }
+
+@media print {
+    .ocultar {
+        display: none;
+    }
+}

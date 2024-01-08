@@ -17,7 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 if (isset($_POST['servicio'])) {
-    $servicios = " (" . implode(", ",$_POST['servicio']) . "), ";
+    $servicios = " (" . implode(", ", $_POST['servicio']) . "), ";
 } else {
     $servicios = "";
 }
@@ -49,7 +49,7 @@ list($año, $mes, $dia) = explode('-', $fecha);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo "Comprobante $numero $inmueble $concepto $periodo ".date('Y');  ?></title>
+    <title><?php echo "Comprobante $numero $inmueble $concepto $periodo " . date('Y');  ?></title>
     <link rel="stylesheet" href="index.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 </head>
@@ -64,14 +64,14 @@ list($año, $mes, $dia) = explode('-', $fecha);
             <div class="col-4">
                 <p><span>Número:</span> <?php echo $numero; ?></p>
                 <p><span>Fecha:</span> <?php echo date('d-m-Y'); ?></p>
-                <p><span>Importe: $<?php echo  number_format($monto, 2, ',', '.') ?></span>  </p>
+                <p><span>Importe: $<?php echo  number_format($monto, 2, ',', '.') ?></span> </p>
             </div>
 
         </div>
         <hr>
         <div class="col-12" style="padding: 20px;">
-            <p style="font-size: 20px;"><span><?php echo "$dia de ". $meses[$mes] ." del $año"; ?></span></p>
-            <p style="font-size: 18px;">Recibí de <span><?php echo $inquilino ?></span> la cantidad de <span>$<?php echo number_format($monto, 2, ',', '.') . " (" . ucfirst($texto) ." pesos),";?></span> en concepto de <span><?php echo "$concepto $servicios";?></span> del inmueble ubicado en calle <span><?php echo  $direccion ?>,</span> mediante <span><?php echo $metodo; ?></span>, correspondiente al período de <span><?php echo  $periodo ?></span> con vencimiento el día <span>10</span> de <span><?php echo  $periodo . " " . date('Y'); ?></span> .</p>
+            <p style="font-size: 20px;"><span><?php echo "$dia de " . $meses[$mes] . " del $año"; ?></span></p>
+            <p style="font-size: 18px;">Recibí de <span><?php echo $inquilino ?></span> la cantidad de <span>$<?php echo number_format($monto, 2, ',', '.') . " (" . ucfirst($texto) . " pesos),"; ?></span> en concepto de <span><?php echo "$concepto $servicios"; ?></span> del inmueble ubicado en calle <span><?php echo  $direccion ?>,</span> mediante <span><?php echo $metodo; ?></span>, correspondiente al período de <span><?php echo  $periodo ?></span> con vencimiento el día <span>10</span> de <span><?php echo  $periodo . " " . date('Y'); ?></span> .</p>
         </div>
         <div style="display:flex; justify-content: end; margin-right: 25px;">
             <div style="display: flex; flex-direction: column; justify-content:center; align-items: center;">
@@ -81,11 +81,48 @@ list($año, $mes, $dia) = explode('-', $fecha);
             </div>
         </div>
     </div>
-    <p style="font-size: 10px; color:black;">Generado por <span> &lt;IV&#47;&gt; </span> Software    igna.a.valdivia@gmail.com +542616865810</p>
+    <p style="font-size: 10px; color:black;">Generado por <span> &lt;IV&#47;&gt; </span> Software igna.a.valdivia@gmail.com +542616865810</p>
 
-
+    <div class="ocultar">
+    <button type="button" id="btnImprimirGuardar" class="btn btn-light" style="border: 1px solid grey;" onclick="enviarDatos()">Imprimir y Guardar</button>
+</div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-  
+    <script>
+        function enviarDatos() {
+            // Obtener los datos que quieres enviar
+            var inmueble = "<?= $inmueble ?>";
+            var numero = "<?= $numero ?>";
+            var fecha = "<?= $fecha ?>";
+            var monto = "<?= $monto ?>";
+            var concepto = "<?= $concepto ?>";
+            var periodo = "<?= $periodo ?>";
+            var metodo = "<?= $metodo ?>";
+
+            // Crear un objeto FormData para enviar datos al archivo PHP
+            var formData = new FormData();
+            formData.append('inmueble', inmueble);
+            formData.append('numero', numero);
+            formData.append('fecha', fecha);
+            formData.append('monto', monto);
+            formData.append('concepto', concepto);
+            formData.append('periodo', periodo);            formData.append('metodo', metodo);
+
+            // Realizar la solicitud AJAX para enviar datos a guardar.php
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'guardar.php', true);
+            xhr.onload = function() {
+                // Verificar si la solicitud se completó correctamente
+                if (xhr.status === 200) {
+                    // Abre la ventana de impresión después de guardar los datos
+                    window.print();
+                } else {
+                    // Manejar errores si es necesario
+                    console.error('Error al enviar datos a guardar.php');
+                }
+            };
+            xhr.send(formData);
+        }
+    </script>
 </body>
 
 </html>
