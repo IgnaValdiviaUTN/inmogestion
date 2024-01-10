@@ -11,6 +11,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $concepto = $_POST["concepto"];
     $periodo = $_POST["periodo"];
     $metodo = $_POST["metodo"];
+    
+    $vencimiento = (isset($_POST["vencimiento"]))? true : false ;
 } else {
     // Si no se han enviado datos, muestra un mensaje de error o redirige a la página del formulario
     echo "<p>Error: No se han recibido datos del formulario.</p>";
@@ -41,6 +43,7 @@ $meses = array(
     '12' => 'diciembre'
 );
 list($año, $mes, $dia) = explode('-', $fecha);
+date_default_timezone_set('America/Argentina/Mendoza');
 ?>
 
 <!DOCTYPE html>
@@ -71,7 +74,7 @@ list($año, $mes, $dia) = explode('-', $fecha);
         <hr>
         <div class="col-12" style="padding: 20px;">
             <p style="font-size: 20px;"><span><?php echo "$dia de " . $meses[$mes] . " del $año"; ?></span></p>
-            <p style="font-size: 18px;">Recibí de <span><?php echo $inquilino ?></span> la cantidad de <span>$<?php echo number_format($monto, 2, ',', '.') . " (" . ucfirst($texto) . " pesos),"; ?></span> en concepto de <span><?php echo "$concepto $servicios"; ?></span> del inmueble ubicado en calle <span><?php echo  $direccion ?>,</span> mediante <span><?php echo $metodo; ?></span>, correspondiente al período de <span><?php echo  $periodo ?></span> con vencimiento el día <span>10</span> de <span><?php echo  $periodo . " " . date('Y'); ?></span> .</p>
+            <p style="font-size: 18px;">Recibí de <span><?php echo $inquilino ?></span> la cantidad de <span>$<?php echo number_format($monto, 2, ',', '.') . " (" . ucfirst($texto) . " pesos),"; ?></span> en concepto de <span><?php echo "$concepto $servicios"; ?></span> del inmueble ubicado en calle <span><?php echo  $direccion ?>,</span> mediante <span><?php echo $metodo; ?></span>, correspondiente al período de <span><?php echo  $periodo ?></span> <?php echo ($vencimiento)? "con vencimiento el día <span>10</span> de <span> $periodo " . date('Y') : "<span>" . date('Y'); ?></span>.</p>
         </div>
         <div style="display:flex; justify-content: end; margin-right: 25px;">
             <div style="display: flex; flex-direction: column; justify-content:center; align-items: center;">

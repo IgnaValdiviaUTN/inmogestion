@@ -49,7 +49,7 @@ try {
 
         <input type="number" value="" id="numero" name="numero" required style="display: none;">
 
-        <div id="detallesInmueble" class="col-12 row">
+        <div id="detallesInmueble" class="row">
             <label for="direccion" class="form-label col-7">Dirección:
                 <input type="text" id="direccion" name="direccion" readonly class="form-control">
             </label>
@@ -60,7 +60,7 @@ try {
 
         <div class="row">
             <label for="monto" class="form-label col">Monto $:
-                <input type="number" id="monto" name="monto" min="0" required class="form-control">
+                <input type="number" id="monto" name="monto" min="0" step="0.01" required class="form-control" inputmode="decimal">
             </label>
 
 
@@ -89,6 +89,10 @@ try {
             </label>
         </div>
 
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" name="vencimiento" checked>
+            <label class="form-check-label" for="flexSwitchCheckDefault">Incluir vencimiento</label>
+        </div>
 
 
         <div class="row col-12">
@@ -138,6 +142,7 @@ try {
                 </label>
             </div>
         </div>
+        
         <div class="col-12 text-end">
             <input class="btn btn-light m-2 " type="submit" value="Generar" style="border: 1px solid grey;">
         </div>
